@@ -33,8 +33,9 @@ const delay = amount => (
 
 const nextJob = async (client, settings) => {
     do {
+        var job;
         try {
-            const job = await client.pickupJob();
+            job = await client.pickupJob();
 
             if (job && job.uid) {
                 return job
