@@ -40,20 +40,18 @@ const nextJob = async (client, settings) => {
                 return job
             }
         } catch (err) {
+            if (process.env.ENABLE_ROLLBAR) {
+                const context = {
+                }
+                if (settings.aerender_log && fs.existsSync(settings.aerender_log)) {
+                    context["aerender_error"] = fs.readFileSync(settings.aerender_log, 'utf8');
+                }
+                rollbar.error(err, job, context);
+            }
             if (settings.stopOnError) {
                 throw err;
             } else {
-                if (process.env.ENABLE_ROLLBAR) {
-                    const context = {
-                    }
-                    if (settings.aerender_log && fs.existsSync(settings.aerender_log)) {
-                        context["aerender_error"] = fs.readFileSync(settings.aerender_log, 'utf8');
-                    }
-                    rollbar.error(err, job, context)
-                }
-                else {
                     console.error(err)
-                }
             }
         }
 

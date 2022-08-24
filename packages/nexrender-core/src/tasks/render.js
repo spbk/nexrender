@@ -163,9 +163,12 @@ module.exports = (job, settings) => {
             const outputStr = output
                 .map(a => '' + a).join('');
 
+            const logExists = fs.existsSync(logPath);
+            if (logExists) {
+                settings.aerender_log = logPath;
+            }
             if (code !== 0 && settings.stopOnError) {
-                if (fs.existsSync(logPath)) {
-                    settings.aerender_log = logPath;
+                if (logExists) {
                     settings.logger.log(`[${job.uid}] dumping aerender log:`)
                     settings.logger.log(fs.readFileSync(logPath, 'utf8'))
                 }
