@@ -165,6 +165,7 @@ module.exports = (job, settings) => {
 
             if (code !== 0 && settings.stopOnError) {
                 if (fs.existsSync(logPath)) {
+                    settings.aerender_log = logPath;
                     settings.logger.log(`[${job.uid}] dumping aerender log:`)
                     settings.logger.log(fs.readFileSync(logPath, 'utf8'))
                 }
