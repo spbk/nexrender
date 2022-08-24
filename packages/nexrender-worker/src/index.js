@@ -43,8 +43,9 @@ const nextJob = async (client, settings) => {
             if (process.env.ENABLE_ROLLBAR) {
                 const context = {
                 }
-                if (settings.aerender_log && fs.existsSync(settings.aerender_log)) {
-                    context["aerender_error"] = fs.readFileSync(settings.aerender_log, 'utf8');
+                if (settings.aerender_log) {
+                    context["aerender_log_file"] = settings.aerender_log_file;
+                    context["aerender_error"] = settings.aerender_log;
                 }
                 rollbar.error(err, job, context);
             }
