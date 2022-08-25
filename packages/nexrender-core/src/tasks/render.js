@@ -168,8 +168,10 @@ module.exports = (job, settings) => {
 
             if (code !== 0 && settings.stopOnError) {
                 if (fs.existsSync(logPath)) {
+                    const aerenderLog = fs.readFileSync(logPath, 'utf8');
                     settings.logger.log(`[${job.uid}] dumping aerender log:`)
-                    settings.logger.log(fs.readFileSync(logPath, 'utf8'))
+                    job.aerenderLog = aerenderLog;
+                    settings.logger.log(aerenderLog)
                 }
 
                 return reject(new Error(outputStr || 'aerender.exe failed to render the output into the file due to an unknown reason'));
