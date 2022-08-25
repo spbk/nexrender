@@ -164,8 +164,8 @@ module.exports = (job, settings) => {
                 .map(a => '' + a).join('');
 
             if (outputStr) {
-                job.aerender_log_file = logPath;
-                job.aerender_log = outputStr;
+                job.aerenderLogFile = logPath;
+                job.aerenderLog = outputStr;
             }
 
             if (code !== 0 && settings.stopOnError) {

@@ -98,9 +98,9 @@ const processJob = async (client, settings, job) => {
                 "job": job,
                 "settings": settings,
             }
-            if (settings.aerender_log) {
-                context["aerender_log_file"] = settings.aerender_log_file;
-                context["aerender_error"] = settings.aerender_log;
+            if (job.aerenderLog) {
+                context["aerender_log_file"] = job.aerenderLogFile;
+                context["aerender_error"] = job.aerenderLog;
             }
             console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")", "(settings: ", settings, ")");
             rollbar.error(err, context);
