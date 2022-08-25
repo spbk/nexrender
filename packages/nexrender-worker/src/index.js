@@ -48,6 +48,7 @@ const nextJob = async (client, settings) => {
                     context["aerender_log_file"] = settings.aerender_log_file;
                     context["aerender_error"] = settings.aerender_log;
                 }
+                console.log("Sending rollbar error: (error: ", err, ")", "(job: " job, ")", "(context: ", context, ")");
                 rollbar.error(err, job, context);
             }
             if (settings.stopOnError) {
