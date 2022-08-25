@@ -95,13 +95,15 @@ const processJob = async (client, settings, job) => {
         job.errorAt = new Date()
         if (process.env.ENABLE_ROLLBAR) {
             const context = {
+                "job": job,
+                "settings": settings,
             }
             if (settings.aerender_log) {
                 context["aerender_log_file"] = settings.aerender_log_file;
                 context["aerender_error"] = settings.aerender_log;
             }
             console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")", "(settings: ", settings, ")");
-            rollbar.error(err, job, context);
+            rollbar.error(err, context);
         }        
         console.log(`[${job.uid}] error occurred: ${err.stack}`);
         await client.updateJob(job.uid, getRenderingStatus(job)).catch((err) => {
