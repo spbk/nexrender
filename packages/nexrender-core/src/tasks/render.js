@@ -163,13 +163,13 @@ module.exports = (job, settings) => {
             const outputStr = output
                 .map(a => '' + a).join('');
 
-            job.aerenderLogBuffer = outputStr;
+            Object.assign({aerenderLogBuffer: outputStr}, job);
 
             if (code !== 0 && settings.stopOnError) {
                 if (fs.existsSync(logPath)) {
                     const aerenderLog = fs.readFileSync(logPath, 'utf8');
                     settings.logger.log(`[${job.uid}] dumping aerender log:`)
-                    job.aerenderLog = aerenderLog;
+                    Object.assign({aerenderLog: aerenderLog}, job);
                     settings.logger.log(aerenderLog)
                 }
 
