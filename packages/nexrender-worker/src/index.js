@@ -101,23 +101,23 @@ const processJob = async (client, settings, job) => {
                 console.log(`[${job.uid}] error occurred: ${err.stack}`)
             }
         });
-
-        if (process.env.ENABLE_ROLLBAR) {
-            const context = {
-                "job": job,
-                "settings": settings,
-            }
-            if (job.aerenderLog) {
-                context["aerenderLogFile"] = job.aerenderLogFile;
-                context["aerenderLog"] = job.aerenderLog;
-            }
-            console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")", "(settings: ", settings, ")");
-            //rollbar.error(err, context);
-            err.context = context;
-        } 
         
         if (settings.stopOnError) {
-            throw err;
+            if (process.env.ENABLE_ROLLBAR) {
+                const context = {
+                    "job": job,
+                    "settings": settings,
+                }
+                if (job.aerenderLog) {
+                    context["aerenderLogFile"] = job.aerenderLogFile;
+                    context["aerenderLog"] = job.aerenderLog;
+                }
+                console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")", "(settings: ", settings, ")");
+                rollbar.error(err, context);
+            }
+            else {
+                throw err;
+            }
         } else {
             console.log(`[${job.uid}] error occurred: ${err.stack}`)
         }
