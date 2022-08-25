@@ -163,8 +163,7 @@ module.exports = (job, settings) => {
             const outputStr = output
                 .map(a => '' + a).join('');
 
-            job.aerenderLogFile = logPath;
-            job.aerenderLog = outputStr;
+            job.aerenderLogBuffer = outputStr;
 
             if (code !== 0 && settings.stopOnError) {
                 if (fs.existsSync(logPath)) {

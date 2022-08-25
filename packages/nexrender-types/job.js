@@ -34,6 +34,8 @@ const create = job => Object.assign({
         prerender: [],
         postrender: [],
     },
+    aerenderLog: undefined,
+    aerenderLogBuffer: undefined,
 }, job || {})
 
 /**
