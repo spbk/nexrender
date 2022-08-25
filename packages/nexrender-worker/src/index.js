@@ -100,7 +100,7 @@ const processJob = async (client, settings, job) => {
                 context["aerender_log_file"] = settings.aerender_log_file;
                 context["aerender_error"] = settings.aerender_log;
             }
-            console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")");
+            console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")", "(settings: ", settings, ")");
             rollbar.error(err, job, context);
         }        
         console.log(`[${job.uid}] error occurred: ${err.stack}`);
