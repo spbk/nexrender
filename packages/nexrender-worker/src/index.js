@@ -33,24 +33,13 @@ const delay = amount => (
 
 const nextJob = async (client, settings) => {
     do {
-        var job;
         try {
-            job = await client.pickupJob();
+            const job = await client.pickupJob();
 
             if (job && job.uid) {
                 return job
             }
         } catch (err) {
-            if (process.env.ENABLE_ROLLBAR) {
-                const context = {
-                }
-                if (settings.aerender_log) {
-                    context["aerender_log_file"] = settings.aerender_log_file;
-                    context["aerender_error"] = settings.aerender_log;
-                }
-                console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")");
-                rollbar.error(err, job, context);
-            }
             if (settings.stopOnError) {
                 throw err;
             } else {
@@ -104,6 +93,16 @@ const processJob = async (client, settings, job) => {
         job.state = 'error';
         job.error = err;
         job.errorAt = new Date()
+        if (process.env.ENABLE_ROLLBAR) {
+            const context = {
+            }
+            if (settings.aerender_log) {
+                context["aerender_log_file"] = settings.aerender_log_file;
+                context["aerender_error"] = settings.aerender_log;
+            }
+            console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")");
+            rollbar.error(err, job, context);
+        }        
         console.log(`[${job.uid}] error occurred: ${err.stack}`);
         await client.updateJob(job.uid, getRenderingStatus(job)).catch((err) => {
             if (settings.stopOnError) {
