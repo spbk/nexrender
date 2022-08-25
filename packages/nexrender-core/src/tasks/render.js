@@ -180,18 +180,16 @@ module.exports = (job, settings) => {
             const outputStr = output
                 .map(a => '' + a).join('');
 
-            //Object.assign({aerenderLogBuffer: outputStr}, job);
-            job.aerenderLogBuffer = outputStr;
+            var aerenderLogBuffer = outputStr;
+            var aerenderLog;
             if (code !== 0 && settings.stopOnError) {
                 if (fs.existsSync(logPath)) {
-                    const aerenderLog = fs.readFileSync(logPath, 'utf8');
+                    aerenderLog = fs.readFileSync(logPath, 'utf8');
                     settings.logger.log(`[${job.uid}] dumping aerender log:`)
-                    //Object.assign({aerenderLog: aerenderLog}, job);
-                    job.aerenderLog = aerenderLog;
                     settings.logger.log(aerenderLog)
                 }
-
-                return reject(new Error(outputStr || 'aerender.exe failed to render the output into the file due to an unknown reason'));
+                const errorMessage = outputStr || 'aerender.exe failed to render the output into the file due to an unknown reason';
+                return reject(new RenderError(aerenderLog, aerenderLogBuffer, errorMessage));
             }
 
             settings.logger.log(`[${job.uid}] rendering took ~${(Date.now() - renderStopwatch) / 1000} sec.`);
@@ -216,11 +214,12 @@ module.exports = (job, settings) => {
 
             if (!fs.existsSync(job.output)) {
                 if (fs.existsSync(logPath)) {
+                    aerenderLog = fs.readFileSync(logPath, 'utf8');
                     settings.logger.log(`[${job.uid}] dumping aerender log:`)
-                    settings.logger.log(fs.readFileSync(logPath, 'utf8'))
+                    settings.logger.log(aerenderLog)
                 }
 
-                return reject(new RenderError(job.aerenderLog, job.aerenderLogBuffer, `Couldn't find a result file: ${outputFile}`))
+                return reject(new RenderError(aerenderLog, aerenderLogBuffer, `Couldn't find a result file: ${outputFile}`))
             }
 
             const stats = fs.statSync(job.output)
