@@ -20,7 +20,7 @@ const seconds = (string) => string.split(':')
 
 
 class RenderError extends Error {
-    constructor(aerenderLog = undefined, aerenderLogBuffer = undefined, ...params) {
+    constructor(aerenderLog, aerenderLogBuffer, ...params) {
         // Pass remaining arguments (including vendor specific ones) to parent constructor
         super(...params);
 
