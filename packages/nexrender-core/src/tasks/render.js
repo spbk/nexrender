@@ -29,6 +29,7 @@ class RenderError extends Error {
         Error.captureStackTrace(this, RenderError);
         }
     
+        console.log("New RenderError encountered: (aerenderLog: ", aerenderLog, ")", " (aerenderLogBuffer: ", aerenderLogBuffer, ")");
         this.name = 'RenderError';
         this.aerenderLog = aerenderLog;
         this.aerenderLogBuffer = aerenderLogBuffer;
