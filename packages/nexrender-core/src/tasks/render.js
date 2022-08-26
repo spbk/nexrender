@@ -33,6 +33,7 @@ class RenderError extends Error {
         this.name = 'RenderError';
         this.aerenderLog = aerenderLog;
         this.aerenderLogBuffer = aerenderLogBuffer;
+        this.data = {"aerenderLog": aerenderLog, "aerenderLogBuffer": aerenderLogBuffer};
         this.date = new Date();
     }
 }
