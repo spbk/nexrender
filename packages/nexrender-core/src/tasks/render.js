@@ -42,7 +42,7 @@ class RenderError extends Error {
  */
 module.exports = (job, settings) => {
     settings.logger.log(`[${job.uid}] rendering job...`);
-
+    settings.logger.log("TESTING FROM CORE PACKAGE");
     // create container for our parameters
     let params = [];
     let outputFile = expandEnvironmentVariables(job.output)
