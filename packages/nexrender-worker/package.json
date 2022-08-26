@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@nexrender/api": "^1.38.0",
-    "@nexrender/core": "^1.39.4",
+    "@nexrender/core": "^1.39.5",
     "@nexrender/types": "^1.38.0",
     "arg": "^4.1.0",
     "chalk": "^2.4.2",
