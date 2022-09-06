@@ -29,11 +29,8 @@ class RenderError extends Error {
         Error.captureStackTrace(this, RenderError);
         }
     
-        console.log("New RenderError encountered: (aerenderLog: ", aerenderLog, ")", " (aerenderLogBuffer: ", aerenderLogBuffer, ")");
         this.name = 'RenderError';
-        this.aerenderLog = aerenderLog;
-        this.aerenderLogBuffer = aerenderLogBuffer;
-        this.data = {"aerenderLog": aerenderLog, "aerenderLogBuffer": aerenderLogBuffer};
+        this.aerenderLog = aerenderLog || aerenderLogBuffer;
         this.date = new Date();
     }
 }
@@ -42,7 +39,6 @@ class RenderError extends Error {
  */
 module.exports = (job, settings) => {
     settings.logger.log(`[${job.uid}] rendering job...`);
-    settings.logger.log("TESTING FROM CORE PACKAGE");
     // create container for our parameters
     let params = [];
     let outputFile = expandEnvironmentVariables(job.output)

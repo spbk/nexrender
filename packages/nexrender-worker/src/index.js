@@ -43,7 +43,7 @@ const nextJob = async (client, settings) => {
             if (settings.stopOnError) {
                 throw err;
             } else {
-                    console.error(err)
+                console.error(err)
             }
         }
 
@@ -108,12 +108,6 @@ const processJob = async (client, settings, job) => {
                     "job": job,
                     "settings": settings,
                 }
-                if (err.aerenderLog || err.aerenderLogBuffer) {
-                    context["aerenderLogBuffer"] = err.aerenderLogBuffer;
-                    context["aerenderLog"] = err.aerenderLog;
-                }
-                console.log("Sending rollbar error: (error: ", err, ")", "(job: ", job, ")", "(context: ", context, ")", "(settings: ", settings, ")");
-                console.log(err.name, " aerenderLog: ", err.aerenderLog, " aerenderLogBuffer: ", err.aerenderLogBuffer, " data: ", err.data );
                 rollbar.error(err, context);
             }
             else {
