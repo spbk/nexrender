@@ -1,0 +1,50 @@
+const path     = require('path')
+const {name}   = require('./package.json')
+const http     = require('http');
+const url      = require('url');
+
+module.exports = (job, settings, { input, params, ...options }, type) => {
+    let onProgress;
+    let onComplete;
+    return new Promise((resolve, reject) => {
+        
+
+
+        const callback_url = url.parse(options.callback);
+        var http_options = {
+            host: callback_url.host,
+            path: callback_url.path,
+        };
+        /* check if input has been provided */
+        input = input || job.output;
+        console.log("Input: ", input);
+        console.log("params: ", params);
+        console.log("options: ", options);
+        console.log("type: ", type);
+        console.log("job: ", job);
+        console.log("settings: ", settings);
+
+        callback = function(response) {
+            var str = '';
+            
+            //another chunk of data has been received, so append it to `str`
+            response.on('data', function (chunk) {
+                str += chunk;
+            });
+            
+            //the whole response has been received, so we just print it out here
+            response.on('end', function () {
+                res = JSON.parse(str);
+                if (response.statusCode >= 200 && response.statusCode <= 299) {
+                    resolve(res);
+                }
+                else {
+                    reject(res);
+                }
+            });
+        }
+        
+        http.request(http_options, callback).end();    
+
+    }
+}
