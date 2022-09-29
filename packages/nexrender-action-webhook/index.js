@@ -37,6 +37,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             
             //the whole response has been received, so we just print it out here
             response.on('end', function () {
+                console.log("Got response back: ", str);
                 res = JSON.parse(str);
                 if (response.statusCode >= 200 && response.statusCode <= 299) {
                     resolve(res);
