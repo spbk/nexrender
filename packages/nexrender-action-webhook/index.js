@@ -7,6 +7,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
     let onComplete;
     return new Promise((resolve, reject) => {
         
+        settings.logger.log(`[${job.uid}] starting action-webhook action`)
 
 
         const callback_url = url.parse(options.callback);
