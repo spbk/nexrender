@@ -53,5 +53,5 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         req = http.request(http_options, callback)
         req.write(postData);
         req.end();
-    }
+    });
 }
