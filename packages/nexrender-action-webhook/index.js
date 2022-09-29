@@ -3,12 +3,18 @@ const http     = require('http');
 const url      = require('url');
 
 module.exports = (job, settings, { input, params, ...options }, type) => {
-    let onProgress;
-    let onComplete;
     return new Promise((resolve, reject) => {
         
         settings.logger.log(`[${job.uid}] starting action-webhook action`)
 
+        /* check if input has been provided */
+        input = input || job.output;
+        console.log("Input: ", input);
+        console.log("params: ", params);
+        console.log("options: ", options);
+        console.log("type: ", type);
+        console.log("job: ", job);
+        console.log("settings: ", settings);
 
         const callback_url = url.parse(options.callback);
         const postData = JSON.stringify(job);
@@ -21,15 +27,6 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
                 'Content-Length': Buffer.byteLength(postData)
             }
         };
-        /* check if input has been provided */
-        input = input || job.output;
-        console.log("Input: ", input);
-        console.log("params: ", params);
-        console.log("options: ", options);
-        console.log("type: ", type);
-        console.log("job: ", job);
-        console.log("settings: ", settings);
-
         callback = function(response) {
             var str = '';
             
