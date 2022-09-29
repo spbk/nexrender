@@ -16,7 +16,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         console.log("job: ", job);
         console.log("settings: ", settings);
 
-        const callback_url = url.parse(options.callback);
+        const callback_url = url.parse(params.callback);
         const postData = JSON.stringify(job);
         var http_options = {
             host: callback_url.host,
