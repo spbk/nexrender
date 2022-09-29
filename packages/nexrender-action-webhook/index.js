@@ -1,4 +1,3 @@
-const path     = require('path')
 const {name}   = require('./package.json')
 const http     = require('http');
 const url      = require('url');
@@ -11,9 +10,15 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
 
 
         const callback_url = url.parse(options.callback);
+        const postData = JSON.stringify(job);
         var http_options = {
             host: callback_url.host,
             path: callback_url.path,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            }
         };
         /* check if input has been provided */
         input = input || job.output;
@@ -44,7 +49,8 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             });
         }
         
-        http.request(http_options, callback).end();    
-
+        req = http.request(http_options, callback)
+        req.write(postData);
+        req.end();
     }
 }
