@@ -111,7 +111,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
               },
         };
         console.log("Sending job ", postData);
-        options.agent = new https.Agent(options);
+        options.agent = new https.Agent(http_options);
         req = https.request(http_options, callback);
         req.on('error', function(e) {
             console.log("Failed to make callback: ", e.message);
