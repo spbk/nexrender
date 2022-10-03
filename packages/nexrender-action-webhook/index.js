@@ -53,9 +53,11 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
                 'Content-Length': Buffer.byteLength(postData)
             },
             checkServerIdentity: function(host, cert) {
+                console.log("Custom checkServerIdentity cb");
                 // Make sure the certificate is issued to the host we are connected to
                 const err = tls.checkServerIdentity(host, cert);
                 if (err) {
+                  console.log("tls.checkServerIdentity err: ", err);
                   return err;
                 }
             
