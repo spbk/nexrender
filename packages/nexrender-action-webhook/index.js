@@ -50,6 +50,9 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             headers: {
                 'Content-Type': 'application/json',
                 'Content-Length': Buffer.byteLength(postData)
+            },
+            checkServerIdentity: function(host, cert) {
+                console.warn("Not checking SSL cert, for testing purposes");                
             }
         };
         console.log("Sending job ", postData);
