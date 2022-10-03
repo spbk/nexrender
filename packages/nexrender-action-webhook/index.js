@@ -1,6 +1,7 @@
-const {name}   = require('./package.json')
+const {name}   = require('./package.json');
+const tls = require('node:tls');
 const https = require('https');
-
+const crypto = require('node:crypto');
 const url      = require('url');
 
 module.exports = (job, settings, { input, params, ...options }, type) => {
@@ -52,8 +53,53 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
                 'Content-Length': Buffer.byteLength(postData)
             },
             checkServerIdentity: function(host, cert) {
-                console.warn("Not checking SSL cert, for testing purposes");                
-            }
+                // Make sure the certificate is issued to the host we are connected to
+                const err = tls.checkServerIdentity(host, cert);
+                if (err) {
+                  return err;
+                }
+            
+                // Pin the public key, similar to HPKP pin-sha256 pinning
+                if (process.env.PIN_PUB_KEY_256) {
+                    const pubkey256 = process.env.PIN_PUB_KEY_256;
+                    if (sha256(cert.pubkey) !== pubkey256) {
+                      const msg = 'Certificate verification error: ' +
+                        `The public key of '${cert.subject.CN}' ` +
+                        'does not match our pinned fingerprint';
+                      return new Error(msg);
+                    }
+                }
+
+            
+                // Pin the exact certificate, rather than the pub key
+                if (process.env.PIN_CERT_256) {
+                    const cert256 = process.env.PIN_CERT_256;
+                  if (cert.fingerprint256 !== cert256) {
+                    const msg = 'Certificate verification error: ' +
+                      `The certificate of '${cert.subject.CN}' ` +
+                      'does not match our pinned fingerprint';
+                    return new Error(msg);
+                  }
+                }
+
+            
+                // This loop is informational only.
+                // Print the certificate and public key fingerprints of all certs in the
+                // chain. Its common to pin the public key of the issuer on the public
+                // internet, while pinning the public key of the service in sensitive
+                // environments.
+                do {
+                  console.log('Subject Common Name:', cert.subject.CN);
+                  console.log('  Certificate SHA256 fingerprint:', cert.fingerprint256);
+            
+                  hash = crypto.createHash('sha256');
+                  console.log('  Public key ping-sha256:', sha256(cert.pubkey));
+            
+                  lastprint256 = cert.fingerprint256;
+                  cert = cert.issuerCertificate;
+                } while (cert.fingerprint256 !== lastprint256);
+            
+              },
         };
         console.log("Sending job ", postData);
         req = https.request(http_options, callback);
