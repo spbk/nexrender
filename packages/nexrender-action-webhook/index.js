@@ -30,7 +30,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         };
         callback = function(response) {
             var str = '';
-            
+            response.setEncoding('utf8');
             //another chunk of data has been received, so append it to `str`
             response.on('data', function (chunk) {
                 str += chunk;
@@ -39,8 +39,8 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             //the whole response has been received, so we just print it out here
             response.on('end', function () {
                 console.log("Got response back: ", str);
-                res = JSON.parse(str);
-                console.log("JSON response: ", res);
+                //res = JSON.parse(str);
+                //console.log("JSON response: ", res);
                 console.log("response code: ", response.statusCode);
                 if (response.statusCode >= 200 && response.statusCode <= 299) {
                     resolve(res);
@@ -52,7 +52,11 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         }
         
         console.log("Sending job ", postData);
-        req = http.request(http_options, callback)
+        req = http.request(http_options, callback);
+        req.on('error', function(e) {
+            console.log("Failed to make callback: ", e.message);
+            reject(e.message);
+        });
         req.write(postData);
        // req.write('{"string": '+postData+'}');
 
