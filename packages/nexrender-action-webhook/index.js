@@ -19,7 +19,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         const callback_url = url.parse(params.callback);
         const postData = JSON.stringify(job);
         var http_options = {
-            host: callback_url.host,
+            hostname: callback_url.host,
             path: callback_url.path,
             method: 'POST',
             headers: {
@@ -52,8 +52,8 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         
         console.log("Sending job ", postData);
         req = http.request(http_options, callback)
-        //req.write(postData);
-        req.write('{"string": '+postData+'}');
+        req.write(postData);
+       // req.write('{"string": '+postData+'}');
 
         req.end();
     });
