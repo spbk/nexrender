@@ -4,6 +4,10 @@ const https = require('https');
 const crypto = require('node:crypto');
 const url      = require('url');
 
+function sha256(s) {
+    return crypto.createHash('sha256').update(s).digest('base64');
+}  
+
 module.exports = (job, settings, { input, params, ...options }, type) => {
     return new Promise((resolve, reject) => {
         
@@ -54,6 +58,9 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             },
             checkServerIdentity: function(host, cert) {
                 console.log("Custom checkServerIdentity cb");
+                if (process.env.ACTION_WEBHOOK_SKIP_SSL_VALIDATION) {
+                    return;
+                }
                 // Make sure the certificate is issued to the host we are connected to
                 const err = tls.checkServerIdentity(host, cert);
                 if (err) {
@@ -104,6 +111,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
               },
         };
         console.log("Sending job ", postData);
+        options.agent = new https.Agent(options);
         req = https.request(http_options, callback);
         req.on('error', function(e) {
             console.log("Failed to make callback: ", e.message);
