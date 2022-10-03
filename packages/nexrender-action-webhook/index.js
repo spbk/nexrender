@@ -1,5 +1,6 @@
 const {name}   = require('./package.json')
-const http     = require('http');
+const https = require('https');
+
 const url      = require('url');
 
 module.exports = (job, settings, { input, params, ...options }, type) => {
@@ -44,16 +45,15 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         var http_options = {
             hostname: callback_url.host,
             path: callback_url.path,
-            port: callback_url.protocol == "https:" ? 443 : 80,
+            port: 443,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                //'Content-Length': Buffer.byteLength(postData)
+                'Content-Length': Buffer.byteLength(postData)
             }
         };
-        console.log("HTTP Options", http_options);
         console.log("Sending job ", postData);
-        req = http.request(http_options, callback);
+        req = https.request(http_options, callback);
         req.on('error', function(e) {
             console.log("Failed to make callback: ", e.message);
             reject(e.message);
