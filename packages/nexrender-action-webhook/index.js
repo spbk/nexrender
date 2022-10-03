@@ -8,13 +8,13 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         settings.logger.log(`[${job.uid}] starting action-webhook action`)
 
         /* check if input has been provided */
-        input = input || job.output;
-        console.log("Input: ", input);
-        console.log("params: ", params);
-        console.log("options: ", options);
-        console.log("type: ", type);
-        console.log("job: ", job);
-        console.log("settings: ", settings);
+        //input = input || job.output;
+        // console.log("Input: ", input);
+        // console.log("params: ", params);
+        // console.log("options: ", options);
+        // console.log("type: ", type);
+        // console.log("job: ", job);
+        // console.log("settings: ", settings);
 
         const callback_url = url.parse(params.callback);
         const postData = JSON.stringify(job);
@@ -39,6 +39,8 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             response.on('end', function () {
                 console.log("Got response back: ", str);
                 res = JSON.parse(str);
+                console.log("JSON response: ", res);
+                console.log("response code: ", response.statusCode);
                 if (response.statusCode >= 200 && response.statusCode <= 299) {
                     resolve(res);
                 }
@@ -48,8 +50,11 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             });
         }
         
+        console.log("Sending job ", postData);
         req = http.request(http_options, callback)
-        req.write(postData);
+        //req.write(postData);
+        req.write('{"string": '+postData+'}');
+
         req.end();
     });
 }
