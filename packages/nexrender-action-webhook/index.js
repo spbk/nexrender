@@ -16,18 +16,6 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         // console.log("job: ", job);
         // console.log("settings: ", settings);
 
-        const callback_url = url.parse(params.callback);
-        const postData = JSON.stringify(job);
-        var http_options = {
-            hostname: callback_url.host,
-            path: callback_url.path,
-            port: callback_url.protocol == "https:" ? 443 : 80,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(postData)
-            }
-        };
         callback = function(response) {
             var str = '';
             response.setEncoding('utf8');
@@ -50,7 +38,20 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
                 }
             });
         }
-        
+
+        const callback_url = url.parse(params.callback);
+        const postData = JSON.stringify(job);
+        var http_options = {
+            hostname: callback_url.host,
+            path: callback_url.path,
+            port: callback_url.protocol == "https:" ? 443 : 80,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                //'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+        console.log("HTTP Options", http_options);
         console.log("Sending job ", postData);
         req = http.request(http_options, callback);
         req.on('error', function(e) {
