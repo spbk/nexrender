@@ -1,9 +1,9 @@
 const {name}   = require('./package.json');
-const tls = require('node:tls');
-const https = require('https');
-const crypto = require('node:crypto');
+const https    = require('https');
 const url      = require('url');
-const fetch = require('node-fetch');
+const crypto   = require('node:crypto');
+const fetch    = require('node:node-fetch');
+const tls      = require('node:tls');
 
 const { checkServerIdentity } = require('node:tls');
 
