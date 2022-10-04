@@ -22,32 +22,9 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         // console.log("job: ", job);
         // console.log("settings: ", settings);
 
-        callback = function(response) {
-            var str = '';
-            response.setEncoding('utf8');
-            //another chunk of data has been received, so append it to `str`
-            response.on('data', function (chunk) {
-                str += chunk;
-            });
-            
-            //the whole response has been received, so we just print it out here
-            response.on('end', function () {
-                console.log("Got response back: ", str);
-                //res = JSON.parse(str);
-                //console.log("JSON response: ", res);
-                console.log("response code: ", response.statusCode);
-                if (response.statusCode >= 200 && response.statusCode <= 299) {
-                    resolve(res);
-                }
-                else {
-                    reject(res);
-                }
-            });
-        }
-
         const callback_url = url.parse(params.callback);
         const postData = JSON.stringify(job);
-        var http_options = {
+        const options = {
             hostname: callback_url.host,
             path: callback_url.path,
             port: 443,
@@ -110,16 +87,45 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             
               },
         };
-        console.log("Sending job ", postData);
-        options.agent = new https.Agent(http_options);
-        req = https.request(http_options, callback);
-        req.on('error', function(e) {
-            console.log("Failed to make callback: ", e.message);
-            reject(e.message);
+  
+        options.agent = new https.Agent(options);
+        const req = https.request(options, (res) => {
+          console.log('All OK. Server matched our pinned cert or public key');
+          console.log('statusCode:', res.statusCode);
+          // Print the HPKP values
+          console.log('headers:', res.headers['public-key-pins']);
+        
+          var str = '';
+          res.setEncoding('utf8');
+          //another chunk of data has been received, so append it to `str`
+          res.on('data', function (chunk) {
+              str += chunk;
+          });
+          
+          //the whole response has been received, so we just print it out here
+          res.on('end', function () {
+              console.log("Got response back: ", str);
+              //res = JSON.parse(str);
+              //console.log("JSON response: ", res);
+              console.log("response code: ", res.statusCode);
+              if (res.statusCode >= 200 && res.statusCode <= 299) {
+                  resolve(res);
+              }
+              else {
+                  reject(res);
+              }
+          });
         });
-        req.write(postData);
-       // req.write('{"string": '+postData+'}');
+        
+        req.on('error', (e) => {
+          reject(e.message);
+        });
 
+        console.log("Sending job ", postData);
+
+        // req.write('{"string": '+postData+'}');
+  
+        req.write(postData);
         req.end();
     });
 }
