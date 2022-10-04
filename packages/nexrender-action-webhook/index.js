@@ -89,7 +89,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             },
             rejectUnauthorized: process.env.ACTION_WEBHOOK_SKIP_SSL_VALIDATION ? false : true,
             checkServerIdentity: checkServerIdentity,
-            agent: false,
+            //agent: false,
         };
   
         http_options.agent = new https.Agent(http_options);
