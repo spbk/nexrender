@@ -33,6 +33,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
                 'Content-Type': 'application/json',
                 'Content-Length': Buffer.byteLength(postData)
             },
+            rejectUnauthorized: process.env.ACTION_WEBHOOK_SKIP_SSL_VALIDATION ? false : true,
             checkServerIdentity: function(host, cert) {
                 console.log("Custom checkServerIdentity cb");
                 if (process.env.ACTION_WEBHOOK_SKIP_SSL_VALIDATION) {
