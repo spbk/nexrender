@@ -24,7 +24,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
 
         const callback_url = url.parse(params.callback);
         const postData = JSON.stringify(job);
-        const options = {
+        const http_options = {
             hostname: callback_url.host,
             path: callback_url.path,
             port: 443,
@@ -88,9 +88,9 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
               },
         };
   
-        options.agent = new https.Agent(options);
-        console.log(options);
-        const req = https.request(options, (res) => {
+        http_options.agent = new https.Agent(http_options);
+        console.log(http_options);
+        const req = https.request(http_options, (res) => {
           console.log('All OK. Server matched our pinned cert or public key');
           console.log('statusCode:', res.statusCode);
           // Print the HPKP values
