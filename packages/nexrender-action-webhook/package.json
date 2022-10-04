@@ -1,6 +1,5 @@
 {
   "name": "@nexrender/action-webhook",
-  "type": "module",
   "authors": [
     "joeystevens00"
   ],

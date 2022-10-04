@@ -2,7 +2,7 @@ const {name}   = require('./package.json');
 const https    = require('https');
 const url      = require('url');
 const crypto   = require('node:crypto');
-const fetch    = require('node:node-fetch');
+const fetch    = require('cross-fetch');
 const tls      = require('node:tls');
 
 const { checkServerIdentity } = require('node:tls');
