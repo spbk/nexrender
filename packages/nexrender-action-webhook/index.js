@@ -85,7 +85,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(postData)
+                //'Content-Length': Buffer.byteLength(postData)
             },
             rejectUnauthorized: process.env.ACTION_WEBHOOK_SKIP_SSL_VALIDATION ? false : true,
             checkServerIdentity: checkServerIdentity,
@@ -93,7 +93,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         };
   
         //http_options.agent = new https.Agent(http_options);
-        console.log(http_options);
+        //console.log(http_options);
         const req = https.request(http_options, (res) => {
           console.log('All OK. Server matched our pinned cert or public key');
           console.log('statusCode:', res.statusCode);
@@ -126,11 +126,8 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
           reject(e.message);
         });
 
-        console.log("Sending job ", postData);
-
-        req.write('{"string": '+postData+'}');
-  
-        //req.write(postData);
+        console.log("Sending job ", postData);  
+        req.write(postData);
         req.end();
     });
 }
