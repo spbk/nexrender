@@ -12,9 +12,7 @@ function sha256(s) {
 }  
 
 module.exports = (job, settings, { input, params, ...options }, type) => {
-    return async function() {
 
-        settings.logger.log(`[${job.uid}] starting action-webhook action`)
 
         /* check if input has been provided */
         //input = input || job.output;
@@ -25,24 +23,32 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         // console.log("job: ", job);
         // console.log("settings: ", settings);
 
-        const callback_url = url.parse(params.callback);
-        const postData = JSON.stringify(job);
-        const httpsAgent = new https.Agent({
-            rejectUnauthorized: process.env.ACTION_WEBHOOK_SKIP_SSL_VALIDATION ? false : true,
+        return new Promise(async function(resolve, reject) {
+            settings.logger.log(`[${job.uid}] starting action-webhook action`)
+
+            const callback_url = url.parse(params.callback);
+            const postData = JSON.stringify(job);
+            const httpsAgent = new https.Agent({
+                rejectUnauthorized: process.env.ACTION_WEBHOOK_SKIP_SSL_VALIDATION ? false : true,
+            });
+            const response = await fetch(params.callback, {
+                method: 'post',
+                body: JSON.stringify(postData),
+                headers: {'Content-Type': 'application/json'},
+                agent: httpsAgent,
+            });
+            const data = await response.json();
+            console.log(data);
+
+            if (response.status != 200) {
+                throw response;
+            }
+            resolve(data);
+        }).catch((error) => {
+            console.log(error);
+            throw error;
         });
-      
-        const response = await fetch(params.callback, {
-            method: 'post',
-            body: JSON.stringify(postData),
-            headers: {'Content-Type': 'application/json'},
-            agent: httpsAgent,
-        });
-        const data = await response.json();
-        console.log(data);
-        if (response.status != 200) {
-            throw response;
-        }
-        return data;
+   
 
     //     const checkServerIdentity = function(host, cert) {
     //         console.log("Custom checkServerIdentity cb");
