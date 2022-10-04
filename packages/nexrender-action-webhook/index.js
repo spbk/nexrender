@@ -155,5 +155,4 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
     //     req.write(postData);
     //     req.end();
     // });
-    }
 }
