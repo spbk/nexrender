@@ -93,7 +93,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         };
   
         //http_options.agent = new https.Agent(http_options);
-        //console.log(http_options);
+        console.log(http_options);
         const req = https.request(http_options, (res) => {
           console.log('All OK. Server matched our pinned cert or public key');
           console.log('statusCode:', res.statusCode);
@@ -109,7 +109,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
           
           //the whole response has been received, so we just print it out here
           res.on('end', function () {
-              console.log("Got response back: ", str);
+              //console.log("Got response back: ", str);
               //res = JSON.parse(str);
               //console.log("JSON response: ", res);
               console.log("response code: ", res.statusCode);
@@ -128,9 +128,9 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
 
         console.log("Sending job ", postData);
 
-        // req.write('{"string": '+postData+'}');
+        req.write('{"string": '+postData+'}');
   
-        req.write(postData);
+        //req.write(postData);
         req.end();
     });
 }
