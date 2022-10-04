@@ -89,6 +89,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         };
   
         options.agent = new https.Agent(options);
+        console.log(options);
         const req = https.request(options, (res) => {
           console.log('All OK. Server matched our pinned cert or public key');
           console.log('statusCode:', res.statusCode);
