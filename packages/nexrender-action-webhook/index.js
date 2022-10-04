@@ -40,8 +40,9 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
         const data = await response.json();
         console.log(data);
         if (response.status != 200) {
-            throw(response);
+            throw response;
         }
+        return data;
 
     //     const checkServerIdentity = function(host, cert) {
     //         console.log("Custom checkServerIdentity cb");
