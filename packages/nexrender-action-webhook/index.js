@@ -12,7 +12,7 @@ function sha256(s) {
 }  
 
 module.exports = (job, settings, { input, params, ...options }, type) => {
-    return async function {
+    return async function() {
 
         settings.logger.log(`[${job.uid}] starting action-webhook action`)
 
