@@ -21,7 +21,8 @@ When creating your render job provide this module as one of the `postrender` act
                 "module": "@nexrender/action-webook",
                 "params": {
                     "callback": "https://myapp.com/nexrender/job",
-	                "auth_token": "abc22313dsf"
+                    "http_method: "post",
+                    "skip_ssl_validation": false
                 }
             }
         ]
@@ -31,4 +32,6 @@ When creating your render job provide this module as one of the `postrender` act
 
 ## Information
 * `params` required argument, object containing parameters for the webhook 
-
+* `params.callback` required argument, URL to make the callback to
+* `params.http_method` optional argument, http method to use in callback, defaults to post
+* `params.skip_ssl_validation` optional argument, skip SSL certificate validation

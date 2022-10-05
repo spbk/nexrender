@@ -20,6 +20,8 @@ const script       = require('./tasks/script')
 const dorender     = require('./tasks/render')
 const postrender   = require('./tasks/actions')('postrender')
 const cleanup      = require('./tasks/cleanup')
+const finished   = require('./tasks/actions')('finished')
+const error   = require('./tasks/actions')('error')
 
 /* place to register all plugins */
 /* so they will be picked up and resolved by pkg */
@@ -119,6 +121,8 @@ const render = (job, settings = {}) => {
         .then(job => state(job, settings, dorender, 'dorender'))
         .then(job => state(job, settings, postrender, 'postrender'))
         .then(job => state(job, settings, cleanup, 'cleanup'))
+        .then(job => state(job, settings, cleanup, 'error'))
+        .then(job => state(job, settings, cleanup, 'finished'))
         .catch(e => {
             state(job, settings, cleanup, 'cleanup');
             throw e;
