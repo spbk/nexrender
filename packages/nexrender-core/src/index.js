@@ -111,6 +111,7 @@ const render = (job, settings = {}) => {
         settings = init(settings)
     }
 
+    var errorCaught;
     return Promise.resolve(job)
         .then(job => state(job, settings, setup, 'setup'))
         .then(job => state(job, settings, predownload, 'predownload'))
@@ -122,10 +123,13 @@ const render = (job, settings = {}) => {
         .then(job => state(job, settings, postrender, 'postrender'))
         .catch(async (e) => {
             await state(job, settings, error, 'error');
-            throw e;
+            errorCaught=e;
         })
         .finally(() => {
             state(job, settings, cleanup, 'cleanup');
+            if (errorCaught) {
+                throw errorCaught;
+            }
             state(job, settings, finished, 'finished');
         });
         // .catch(e => {
