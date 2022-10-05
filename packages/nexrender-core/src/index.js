@@ -121,8 +121,10 @@ const render = (job, settings = {}) => {
         .then(job => state(job, settings, dorender, 'dorender'))
         .then(job => state(job, settings, postrender, 'postrender'))
         .catch(e =>  {
-            state(job, settings, error, 'error');
-            throw e;
+            state(job, settings, error, 'error')
+            .then(function() {
+                throw e;
+            });
         })
         .finally(() => {
             state(job, settings, cleanup, 'cleanup');
