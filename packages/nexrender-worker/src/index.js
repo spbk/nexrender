@@ -43,7 +43,7 @@ const nextJob = async (client, settings) => {
             if (settings.stopOnError) {
                 throw err;
             } else {
-                console.error(err)
+                settings.logger.error(err)
             }
         }
 
@@ -55,8 +55,8 @@ const processJob = async (client, settings, job) => {
     try {
         await client.updateJob(job.uid, job)
     } catch(err) {
-        console.log(`[${job.uid}] error while updating job state to ${job.state}. Job abandoned.`)
-        console.log(`[${job.uid}] error stack: ${err.stack}`)
+        settings.logger.log(`[${job.uid}] error while updating job state to ${job.state}. Job abandoned.`)
+        settings.logger.log(`[${job.uid}] error stack: ${err.stack}`)
         return;
     }
 
@@ -69,7 +69,7 @@ const processJob = async (client, settings, job) => {
                 if (settings.stopOnError) {
                     throw err;
                 } else {
-                    console.log(`[${job.uid}] error occurred: ${err.stack}`)
+                    settings.logger.log(`[${job.uid}] error occurred: ${err.stack}`)
                 }
             }
         }
@@ -93,12 +93,12 @@ const processJob = async (client, settings, job) => {
         job.state = 'error';
         job.error = err;
         job.errorAt = new Date()       
-        console.log(`[${job.uid}] error occurred: ${err.stack}`);
+        settings.logger.log(`[${job.uid}] error occurred: ${err.stack}`);
         await client.updateJob(job.uid, getRenderingStatus(job)).catch((err) => {
             if (settings.stopOnError) {
                 throw err;
             } else {
-                console.log(`[${job.uid}] error occurred: ${err.stack}`)
+                settings.logger.log(`[${job.uid}] error occurred: ${err.stack}`)
             }
         });
         
@@ -114,7 +114,7 @@ const processJob = async (client, settings, job) => {
                 throw err;
             }
         } else {
-            console.log(`[${job.uid}] error occurred: ${err.stack}`)
+            settings.logger.log(`[${job.uid}] error occurred: ${err.stack}`)
         }
     }
 }

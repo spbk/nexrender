@@ -20,8 +20,8 @@ const script       = require('./tasks/script')
 const dorender     = require('./tasks/render')
 const postrender   = require('./tasks/actions')('postrender')
 const cleanup      = require('./tasks/cleanup')
-const finished   = require('./tasks/actions')('finished')
-const error   = require('./tasks/actions')('error')
+const finished     = require('./tasks/actions')('finished')
+const error        = require('./tasks/actions')('error')
 
 /* place to register all plugins */
 /* so they will be picked up and resolved by pkg */

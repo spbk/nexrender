@@ -25,9 +25,9 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             if (response.status != 200) {
                 throw response;
             }
-            resolve(data);
+            resolve(job);
         }).catch((error) => {
             settings.logger.log(`[${job.uid}] encountered error when calling webhook: ${error.message}`);
-            reject(error);
+            reject(job);
         });
 }
