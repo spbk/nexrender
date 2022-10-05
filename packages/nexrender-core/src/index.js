@@ -125,10 +125,11 @@ const render = (job, settings = {}) => {
         .catch(e => {
             state(job, settings, cleanup, 'cleanup');
             error(job, settings)
-                .then(job => state(job, settings, error, 'error'))
                 .then(function() {
                     throw e;
                 });
+                //                .then(job => state(job, settings, error, 'error'))
+
         });
 };
 
