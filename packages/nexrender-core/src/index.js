@@ -124,7 +124,7 @@ const render = (job, settings = {}) => {
         .then(job => state(job, settings, finished, 'finished'))
         .catch(e => {
             state(job, settings, cleanup, 'cleanup');
-            error(job, settings);
+            error(job, settings).then(job => state(job, settings, error, 'error'));
             throw e;
         });
 };

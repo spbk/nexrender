@@ -12,7 +12,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             });
             
             const http_method = params.http_method || 'post';
-            settings.logger.log(`${http_method} ${params.callback} with job`);
+            settings.logger.log(`[${job.uid}] calling ${http_method} ${params.callback} with job`);
             const response = await fetch(params.callback, {
                 method: http_method,
                 body: JSON.stringify(job),
@@ -27,7 +27,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
             }
             resolve(data);
         }).catch((error) => {
-            settings.logger.log(error);
+            settings.logger.log(`[${job.uid}] encountered error when calling webhook: ${error.message}`);
             reject(error);
         });
 }
