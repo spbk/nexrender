@@ -409,6 +409,8 @@ Job can have state feild (`job.state`) be set to one of those values:
  * `render:dorender`
  * `render:postrender`
  * `render:cleanup`
+ * `render:error` (when rendering encounters error)
+ * `render:finished` (when rendering is successful)
  * `finished` (when worker successfully finished rendering the job)
  * `error` (when worker got an error at any step starting from `started` state)
 
