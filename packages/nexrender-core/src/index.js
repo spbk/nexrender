@@ -120,16 +120,14 @@ const render = (job, settings = {}) => {
         .then(job => state(job, settings, script, 'script'))
         .then(job => state(job, settings, dorender, 'dorender'))
         .then(job => state(job, settings, postrender, 'postrender'))
-        .catch(e =>  {
-            state(job, settings, error, 'error')
-            .then(function() {
-                throw e;
-            });
+        .catch(async (e) => {
+            await state(job, settings, error, 'error');
+            throw e;
         })
         .finally(() => {
             state(job, settings, cleanup, 'cleanup');
             state(job, settings, finished, 'finished');
-        })
+        });
         // .catch(e => {
         //     error(job, settings)
         //         .then(function() {
