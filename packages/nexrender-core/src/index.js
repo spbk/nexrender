@@ -120,17 +120,19 @@ const render = (job, settings = {}) => {
         .then(job => state(job, settings, script, 'script'))
         .then(job => state(job, settings, dorender, 'dorender'))
         .then(job => state(job, settings, postrender, 'postrender'))
-        .then(job => state(job, settings, cleanup, 'cleanup'))
-        .catch(e => {
-            error(job, settings)
-                .then(function() {
-                    throw e;
-                });
-            state(job, settings, cleanup, 'cleanup');
-                //        .then(job => state(job, settings, finished, 'finished'))
-                //                .then(job => state(job, settings, error, 'error'))
+        .catch(e => state(job, settings, error, 'error'))
+        .finally(() => state(job, settings, cleanup, 'cleanup'))
+        // .catch(e => {
+        //     error(job, settings)
+        //         .then(function() {
+        //             throw e;
+        //         });
+        //     state(job, settings, cleanup, 'cleanup');
+        //         //        .then(job => state(job, settings, finished, 'finished'))
+        //         //                .then(job => state(job, settings, error, 'error'))
+        //        .then(job => state(job, settings, cleanup, 'cleanup'))
 
-        });
+        // });
 };
 
 module.exports = {
