@@ -20,7 +20,7 @@ module.exports = (job, settings, { input, params, ...options }, type) => {
                 agent: httpsAgent,
             });
             const data = await response.json();
-            console.log(data);
+            settings.logger.log(data);
 
             if (response.status != 200) {
                 throw response;
