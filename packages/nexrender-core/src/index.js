@@ -121,14 +121,13 @@ const render = (job, settings = {}) => {
         .then(job => state(job, settings, dorender, 'dorender'))
         .then(job => state(job, settings, postrender, 'postrender'))
         .then(job => state(job, settings, cleanup, 'cleanup'))
+        .then(job => state(job, settings, finished, 'finished'))
         .catch(e => {
             state(job, settings, cleanup, 'cleanup');
             error(job, settings);
             throw e;
         });
 };
-//        .then(job => state(job, settings, finished, 'finished'))
-
 
 module.exports = {
     init,
