@@ -132,17 +132,6 @@ const render = (job, settings = {}) => {
             }
             state(job, settings, finished, 'finished');
         });
-        // .catch(e => {
-        //     error(job, settings)
-        //         .then(function() {
-        //             throw e;
-        //         });
-        //     state(job, settings, cleanup, 'cleanup');
-        //         //        .then(job => state(job, settings, finished, 'finished'))
-        //         //                .then(job => state(job, settings, error, 'error'))
-        //        .then(job => state(job, settings, cleanup, 'cleanup'))
-
-        // });
 };
 
 module.exports = {
