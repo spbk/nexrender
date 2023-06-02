@@ -1,0 +1,14 @@
+{
+  "name": "@nexrender/action-webhook",
+  "authors": [
+    "joeystevens00"
+  ],
+  "version": "1.0.0",
+  "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "cross-fetch": "^3.1.5"
+  }
+}
