@@ -20,6 +20,8 @@ const script       = require('./tasks/script')
 const dorender     = require('./tasks/render')
 const postrender   = require('./tasks/actions')('postrender')
 const cleanup      = require('./tasks/cleanup')
+const finished     = require('./tasks/actions')('finished')
+const error        = require('./tasks/actions')('error')
 
 const { create } = require('@nexrender/types/job')
 
@@ -113,6 +115,7 @@ const render = (jobConfig, settings = {}) => {
 
      /* fill default job fields */
     const job = create(jobConfig)
+    var errorCaught;
     return Promise.resolve(job)
         .then(job => state(job, settings, setup, 'setup'))
         .then(job => state(job, settings, predownload, 'predownload'))
@@ -122,10 +125,16 @@ const render = (jobConfig, settings = {}) => {
         .then(job => state(job, settings, script, 'script'))
         .then(job => state(job, settings, dorender, 'dorender'))
         .then(job => state(job, settings, postrender, 'postrender'))
-        .then(job => state(job, settings, cleanup, 'cleanup'))
-        .catch(e => {
+        .catch(async (e) => {
+            await state(job, settings, error, 'error');
+            errorCaught=e;
+        })
+        .finally(() => {
             state(job, settings, cleanup, 'cleanup');
-            throw e;
+            if (errorCaught) {
+                throw errorCaught;
+            }
+            state(job, settings, finished, 'finished');
         });
 };
 

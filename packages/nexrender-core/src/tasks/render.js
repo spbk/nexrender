@@ -19,12 +19,27 @@ const seconds = (string) => string.split(':')
     .map((e, i) => (i < 3) ? +e * Math.pow(60, 2 - i) : +e * 10e-6)
     .reduce((acc, val) => acc + val);
 
+
+class RenderError extends Error {
+    constructor(aerenderLog, aerenderLogBuffer, ...params) {
+        // Pass remaining arguments (including vendor specific ones) to parent constructor
+        super(...params);
+
+        // Maintains proper stack trace for where our error was thrown (only available on V8)
+        if (Error.captureStackTrace) {
+        Error.captureStackTrace(this, RenderError);
+        }
+    
+        this.name = 'RenderError';
+        this.aerenderLog = aerenderLog || aerenderLogBuffer;
+        this.date = new Date();
+    }
+}
 /**
  * This task creates rendering process
  */
 module.exports = (job, settings) => {
     settings.logger.log(`[${job.uid}] rendering job...`);
-
     // create container for our parameters
     let params = [];
     let outputFile = expandEnvironmentVariables(job.output)
@@ -200,14 +215,18 @@ Estimated date of change to the new behavior: 2023-06-01.\n`);
             const outputStr = output
                 .map(a => '' + a).join('');
 
+            var aerenderLogBuffer = outputStr;
+            var aerenderLog;
             if (code !== 0 && settings.stopOnError) {
                 if (fs.existsSync(logPath)) {
+                    aerenderLog = fs.readFileSync(logPath, 'utf8');
                     settings.logger.log(`[${job.uid}] dumping aerender log:`)
-                    settings.logger.log(fs.readFileSync(logPath, 'utf8'))
+                    settings.logger.log(aerenderLog)
                 }
 
                 clearTimeout(timeoutID);
-                return reject(new Error(outputStr || 'aerender.exe failed to render the output into the file due to an unknown reason'));
+                const errorMessage = outputStr || 'aerender.exe failed to render the output into the file due to an unknown reason';
+                return reject(new RenderError(aerenderLog, aerenderLogBuffer, errorMessage));
             }
 
             settings.logger.log(`[${job.uid}] rendering took ~${(Date.now() - renderStopwatch) / 1000} sec.`);
@@ -240,12 +259,13 @@ Estimated date of change to the new behavior: 2023-06-01.\n`);
 
             if (defaultOutputs.length === 0 || !fs.existsSync(defaultOutputs[0])) {
                 if (fs.existsSync(logPath)) {
+                    aerenderLog = fs.readFileSync(logPath, 'utf8');
                     settings.logger.log(`[${job.uid}] dumping aerender log:`)
-                    settings.logger.log(fs.readFileSync(logPath, 'utf8'))
+                    settings.logger.log(aerenderLog)
                 }
 
                 clearTimeout(timeoutID);
-                return reject(new Error(`Couldn't find a result file: ${outputFile}`))
+                return reject(new RenderError(aerenderLog, aerenderLogBuffer, `Couldn't find a result file: ${outputFile}`))
             }
 
             job.output = defaultOutputs[0];

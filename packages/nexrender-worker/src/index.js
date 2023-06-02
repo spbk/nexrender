@@ -2,6 +2,31 @@ const { createClient } = require('@nexrender/api')
 const { init, render } = require('@nexrender/core')
 const { getRenderingStatus } = require('@nexrender/types/job')
 
+var rollbar = null;
+if(process.env.ENABLE_ROLLBAR) {
+    var Rollbar = require('rollbar');
+    rollbar = new Rollbar({
+      accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
+      captureUncaught: true,
+      captureUnhandledRejections: true,
+      payload: {
+        code_version: '1.0.0',
+        environment: process.env.ENVIRONMENT
+      }
+    });
+}
+
+
+
+var tracer = null;
+var renderWithTrace = null;
+
+if(process.env.ENABLE_DATADOG_APM) {
+    tracer = require('dd-trace').init();
+    renderWithTrace = tracer.wrap('render', render);
+}
+
+
 const NEXRENDER_API_POLLING = process.env.NEXRENDER_API_POLLING || 30 * 1000;
 const NEXRENDER_TOLERATE_EMPTY_QUEUES = process.env.NEXRENDER_TOLERATE_EMPTY_QUEUES;
 var emptyReturns = 0;
@@ -34,14 +59,104 @@ const nextJob = async (client, settings) => {
             if (settings.stopOnError) {
                 throw err;
             } else {
-                console.error(err)
-                console.error("render proccess stopped with error...")
-                console.error("continue listening next job...")
+                settings.logger.error(err)
+                settings.logger.error("render proccess stopped with error...")
+                settings.logger.error("continue listening next job...")
             }
         }
 
         if (active) await delay(settings.polling || NEXRENDER_API_POLLING)
     } while (active)
+}
+
+const processJob = async (client, settings, job) => {
+    try {
+        await client.updateJob(job.uid, job)
+    } catch(err) {
+        settings.logger.log(`[${job.uid}] error while updating job state to ${job.state}. Job abandoned.`)
+        settings.logger.log(`[${job.uid}] error stack: ${err.stack}`)
+        return  "continue";
+    }
+
+    try {
+        job.onRenderProgress = function (job, /* progress */) {
+            try {
+                /* send render progress to our server */
+                client.updateJob(job.uid, getRenderingStatus(job))
+            } catch (err) {
+                if (settings.stopOnError) {
+                    throw err;
+                } else {
+                    settings.logger.log(`[${job.uid}] error occurred: ${err.stack}`)
+                    settings.logger.log(`[${job.uid}] render proccess stopped with error...`)
+                    settings.logger.log(`[${job.uid}] continue listening next job...`)
+                }
+            }
+        }
+
+        job.onRenderError = (job, err /* on render error */) => {
+            job.error = [].concat(job.error || [], [err.toString()]);
+        }
+
+        if (process.env.ENABLE_DATADOG_APM) {
+            job = await renderWithTrace(job, settings); {
+                job.state = 'finished';
+                job.finishedAt = new Date()
+            }
+         }
+         else {
+            job = await render(job, settings); {
+                job.state = 'finished';
+                job.finishedAt = new Date()
+            }
+         }
+
+
+        await client.updateJob(job.uid, getRenderingStatus(job))
+    } catch (err) {
+        job.error = [].concat(job.error || [], [err.toString()]);
+        job.errorAt = new Date();
+        job.state = 'error';
+
+        await client.updateJob(job.uid, getRenderingStatus(job)).catch((err) => {
+            if (settings.stopOnError) {
+                throw err;
+            } else {
+                settings.logger.log(`[${job.uid}] error occurred: ${err.stack}`)
+                settings.logger.log(`[${job.uid}] render proccess stopped with error...`)
+                settings.logger.log(`[${job.uid}] continue listening next job...`)
+            }
+        });
+        
+        if (settings.stopOnError) {
+            if (process.env.ENABLE_ROLLBAR) {
+                const context = {
+                    "job": job,
+                    "settings": settings,
+                }
+                rollbar.error(err, context);
+            }
+            else {
+                throw err;
+            }
+        } else {
+            settings.logger.log(`[${job.uid}] error occurred: ${err.stack}`)
+            settings.logger.log(`[${job.uid}] render proccess stopped with error...`)
+            settings.logger.log(`[${job.uid}] continue listening next job...`)
+        }
+    }
+}
+
+const nextJobSetStarted = async(client, settings) => {
+    let job = await nextJob(client, settings);
+
+    // if the worker has been deactivated, exit this loop
+    if (!active) return "break";
+
+    job.state = 'started';
+    job.startedAt = new Date();
+
+    return job;
 }
 
 /**
@@ -74,70 +189,24 @@ const start = async (host, secret, settings, headers) => {
     const client = createClient({ host, secret, headers });
 
     do {
-        let job = await nextJob(client, settings);
+        if(process.env.ENABLE_DATADOG_APM) {
+            var result = await tracer.trace('job', async span => {
+                let job = await nextJobSetStarted(client, settings);
 
-        // if the worker has been deactivated, exit this loop
-        if (!active) break;
+                if (job === "break") return "break";
 
-        job.state = 'started';
-        job.startedAt = new Date()
+                span.setTag('uid', job.uid);
+                await processJob(client, settings, job)
+            })
 
-        try {
-            await client.updateJob(job.uid, job)
-        } catch(err) {
-            console.log(`[${job.uid}] error while updating job state to ${job.state}. Job abandoned.`)
-            console.log(`[${job.uid}] error stack: ${err.stack}`)
-            continue;
+            if (result === "break") break;
         }
+        else {
+            let job = await nextJobSetStarted(client, settings);
+            if (job === "break") break;
 
-        try {
-            job.onRenderProgress = (job) => {
-                try {
-                    /* send render progress to our server */
-                    client.updateJob(job.uid, getRenderingStatus(job))
-                } catch (err) {
-                    if (settings.stopOnError) {
-                        throw err;
-                    } else {
-                        console.log(`[${job.uid}] error occurred: ${err.stack}`)
-                        console.log(`[${job.uid}] render proccess stopped with error...`)
-                        console.log(`[${job.uid}] continue listening next job...`)
-                    }
-                }
-            }
-
-            job.onRenderError = (job, err /* on render error */) => {
-                job.error = [].concat(job.error || [], [err.toString()]);
-            }
-
-            job = await render(job, settings); {
-                job.state = 'finished';
-                job.finishedAt = new Date()
-            }
-
-            await client.updateJob(job.uid, getRenderingStatus(job))
-        } catch (err) {
-            job.error = [].concat(job.error || [], [err.toString()]);
-            job.errorAt = new Date();
-            job.state = 'error';
-
-            await client.updateJob(job.uid, getRenderingStatus(job)).catch((err) => {
-                if (settings.stopOnError) {
-                    throw err;
-                } else {
-                    console.log(`[${job.uid}] error occurred: ${err.stack}`)
-                    console.log(`[${job.uid}] render proccess stopped with error...`)
-                    console.log(`[${job.uid}] continue listening next job...`)
-                }
-            });
-
-            if (settings.stopOnError) {
-                throw err;
-            } else {
-                console.log(`[${job.uid}] error occurred: ${err.stack}`)
-                console.log(`[${job.uid}] render proccess stopped with error...`)
-                console.log(`[${job.uid}] continue listening next job...`)
-            }
+            let result = await processJob(client, settings, job)
+            if (result === "continue") continue;
         }
     } while (active)
 }
