@@ -1,4 +1,5 @@
 const { createClient } = require('@nexrender/api')
+const tracer           = require('@nexrender/core/helpers/tracer')
 const { init, render } = require('@nexrender/core')
 const { getRenderingStatus } = require('@nexrender/types/job')
 
@@ -16,16 +17,10 @@ if(process.env.ENABLE_ROLLBAR) {
     });
 }
 
-
-
-var tracer = null;
 var renderWithTrace = null;
-
 if(process.env.ENABLE_DATADOG_APM) {
-    tracer = require('dd-trace').init();
     renderWithTrace = tracer.wrap('render', render);
 }
-
 
 const NEXRENDER_API_POLLING = process.env.NEXRENDER_API_POLLING || 30 * 1000;
 const NEXRENDER_TOLERATE_EMPTY_QUEUES = process.env.NEXRENDER_TOLERATE_EMPTY_QUEUES;

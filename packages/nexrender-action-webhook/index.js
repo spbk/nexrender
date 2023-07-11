@@ -1,4 +1,3 @@
-const {name}   = require('./package.json');
 const https    = require('https');
 const fetch    = require('cross-fetch');
 
