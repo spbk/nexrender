@@ -33,8 +33,5 @@
     "lerna": "^3.21.0",
     "mocha": "^7.1.2",
     "pkg": "^5.8.0"
-  },
-  "dependencies": {
-    "@nexrender/action-webhook": "file:packages/nexrender-action-webhook"
   }
 }
