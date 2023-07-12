@@ -140,5 +140,6 @@ const render = (jobConfig, settings = {}) => {
 
 module.exports = {
     init,
-    render
+    render,
+    tracer: require('./helpers/tracer')
 }

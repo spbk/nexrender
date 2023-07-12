@@ -1,6 +1,5 @@
 const { createClient } = require('@nexrender/api')
-const tracer           = require('@nexrender/core/helpers/tracer')
-const { init, render } = require('@nexrender/core')
+const { init, render, tracer } = require('@nexrender/core')
 const { getRenderingStatus } = require('@nexrender/types/job')
 
 var rollbar = null;
