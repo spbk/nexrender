@@ -1,12 +1,7 @@
 const fetch = require('isomorphic-unfetch')
 
 const createClient = ({ host, secret, polling, headers, settings }) => {
-    console.log("creating client")
-    settings.logger.log("testing in create client")
-
-    settings.logger.debug("defining wrapped fetch")
     const wrappedFetch = async (path, options) => {
-        settings.logger.debug("wrapped fetch", path, options)
         options = options || {}
 
         const defaultHeaders = {};
@@ -26,7 +21,6 @@ const createClient = ({ host, secret, polling, headers, settings }) => {
             options.headers['nexrender-secret'] = secret
         }
 
-        settings.logger.debug("fetching", `${host}/api/v1${path}`, options)
         const response = await fetch(`${host}/api/v1${path}`, options)
 
         if (!response.ok) {
@@ -36,7 +30,6 @@ const createClient = ({ host, secret, polling, headers, settings }) => {
         return await response.json();
     }
 
-    settings.logger.debug("defined!")
     return Object.assign({ secret, host },
         require('./job')(wrappedFetch, polling),
     );

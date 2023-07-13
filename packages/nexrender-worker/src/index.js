@@ -30,14 +30,11 @@ const delay = amount => (
 const nextJob = async (client, settings) => {
     do {
         try {
-            settings.logger.info("attempting to pickup job...")
-
             let job = await (settings.tagSelector ?
                 await client.pickupJob(settings.tagSelector) :
                 await client.pickupJob()
             );
             
-            settings.logger.info("job picked up!", JSON.stringify(job || {}))
             if (job && job.uid) {
                 emptyReturns = 0;
                 return job
@@ -164,9 +161,7 @@ const start = async (host, secret, settings, headers) => {
     settings = init(Object.assign({}, settings, {
         logger: console,
     }))
-    settings.logger.log("initializing tracer...")
     settings.tracer = initTracer(settings)
-    settings.logger.log("tracer initialized...")
 
     settings.logger.log('starting nexrender-worker with following settings:')
     Object.keys(settings).forEach(key => {
@@ -188,7 +183,7 @@ const start = async (host, secret, settings, headers) => {
 
     do {
         if(process.env.ENABLE_DATADOG_APM) {
-            settings.logger.log("ENABLE_DATADOG_APM is enabled attempting to trace")
+            settings.logger.log("ENABLE_DATADOG_APM is enabled")
             var result = await settings.tracer.trace('job', async span => {
                 let job = await nextJobSetStarted(client, settings);//
 
