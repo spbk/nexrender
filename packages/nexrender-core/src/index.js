@@ -138,8 +138,34 @@ const render = (jobConfig, settings = {}) => {
         });
 };
 
+class NoopSpan {
+    setTag(_key, _value) { return this }
+}
+
+class NoopTracer {
+    wrap(_name, cb) { return cb() }
+
+    trace(_name, cb) { return cb(new NoopSpan()) }
+}
+
+const initTracer = (settings) => {
+    let localTracer
+    settings.logger.log("process.env.ENABLE_DATADOG_APM: " + process.env.ENABLE_DATADOG_APM)
+    settings.logger.log("process.env.DD_TRACE_AGENT_URL: " + process.env.DD_TRACE_AGENT_URL)
+
+    if(process.env.ENABLE_DATADOG_APM) {
+        settings.logger.log("Datadog APM enabling...");
+        localTracer = require('dd-trace').init();
+        settings.logger.log(JSON.stringify(localTracer.options))
+    } else {
+        // define noop tracer if datadog is not enabled
+        localTracer = new NoopTracer()
+    }
+    return localTracer
+}
+
 module.exports = {
     init,
     render,
-    tracer: require('./helpers/tracer')
+    initTracer
 }
