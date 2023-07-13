@@ -180,8 +180,8 @@ const start = async (host, secret, settings, headers) => {
     }
 
     settings.logger.log("Creating client with host:" + host)
-    const client = createClient({ host, secret, headers });
-    settings.logger.log("Client created!")
+    const client = createClient({ host, secret, headers, settings });
+    settings.logger.log("Client created!", JSON.stringify(client))
 
     do {
         //if(process.env.ENABLE_DATADOG_APM) {
