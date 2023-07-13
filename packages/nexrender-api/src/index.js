@@ -2,6 +2,7 @@ const fetch = require('isomorphic-unfetch')
 
 const createClient = ({ host, secret, polling, headers, settings }) => {
     const wrappedFetch = async (path, options) => {
+        settings.logger.debug("wrapped fetch", path, options)
         options = options || {}
 
         const defaultHeaders = {};
@@ -21,11 +22,10 @@ const createClient = ({ host, secret, polling, headers, settings }) => {
             options.headers['nexrender-secret'] = secret
         }
 
-        settings.logger.log("fetching", `${host}/api/v1${path}`, options)
-        
+        settings.logger.debug("fetching", `${host}/api/v1${path}`, options)
         const response = await fetch(`${host}/api/v1${path}`, options)
 
-        settings.logger.log("response", response)
+        settings.logger.debug("response", response)
 
         if (!response.ok) {
             throw new Error(await response.text())
