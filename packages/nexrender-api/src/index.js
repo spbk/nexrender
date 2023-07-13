@@ -1,6 +1,7 @@
 const fetch = require('isomorphic-unfetch')
 
 const createClient = ({ host, secret, polling, headers, settings }) => {
+    settings.logger.debug("defining wrapped fetch")
     const wrappedFetch = async (path, options) => {
         settings.logger.debug("wrapped fetch", path, options)
         options = options || {}
@@ -34,6 +35,7 @@ const createClient = ({ host, secret, polling, headers, settings }) => {
         return await response.json();
     }
 
+    settings.logger.debug("defined!")
     return Object.assign({ secret, host },
         require('./job')(wrappedFetch, polling),
     );
