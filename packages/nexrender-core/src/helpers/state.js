@@ -1,5 +1,3 @@
-const tracer       = require('./tracer')
-
 module.exports = (job, settings, fn, fnName) => {
     var renderPrefix = `render.${fnName}`
     if (settings.tracer) {
