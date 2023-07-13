@@ -187,27 +187,26 @@ const start = async (host, secret, settings, headers) => {
     settings.logger.log("Client created!", JSON.stringify(client))
 
     do {
-        //if(process.env.ENABLE_DATADOG_APM) {
-            //settings.logger.log("ENABLE_DATADOG_APM is enabled attempting to trace")
-            //var result = await settings.tracer.trace('job', async span => {
-                //let job = await nextJobSetStarted(client, settings);//
+        if(process.env.ENABLE_DATADOG_APM) {
+            settings.logger.log("ENABLE_DATADOG_APM is enabled attempting to trace")
+            var result = await settings.tracer.trace('job', async span => {
+                let job = await nextJobSetStarted(client, settings);//
 
-                //if (job === "break") return "break";//
+                if (job === "break") return "break";//
 
-                //span.setTag('uid', job.uid);
-                //await processJob(client, settings, job)
-            //})//
+                span.setTag('uid', job.uid);
+                await processJob(client, settings, job)
+            })//
 
-            //if (result === "break") break;
-        //}
-        //else {
+            if (result === "break") break;
+        } else {
             settings.logger.log("ENABLE_DATADOG_APM is not enabled")
             let job = await nextJobSetStarted(client, settings);
             if (job === "break") break;
 
             let result = await processJob(client, settings, job)
             if (result === "continue") continue;
-        //}
+        }
     } while (active)
 }
 

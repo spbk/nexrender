@@ -153,15 +153,15 @@ const initTracer = (settings) => {
     settings.logger.log("process.env.ENABLE_DATADOG_APM: " + process.env.ENABLE_DATADOG_APM)
     settings.logger.log("process.env.DD_TRACE_AGENT_URL: " + process.env.DD_TRACE_AGENT_URL)
 
-    // if(process.env.ENABLE_DATADOG_APM) {
-        // settings.logger.log("Datadog APM enabling...");
-        // localTracer = require('dd-trace').init();
-        // settings.logger.log(JSON.stringify(localTracer._tracer._url))
-    // } else {
+    if(process.env.ENABLE_DATADOG_APM) {
+        settings.logger.log("Datadog APM enabling...");
+        localTracer = require('dd-trace').init();
+        settings.logger.log(JSON.stringify(localTracer._tracer._url))
+    } else {
         // define noop tracer if datadog is not enabled
         settings.logger.log("enabling noop tracer...")
         localTracer = new NoopTracer()
-    // }
+    }
     return localTracer
 }
 

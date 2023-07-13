@@ -29,8 +29,6 @@ const createClient = ({ host, secret, polling, headers, settings }) => {
         settings.logger.debug("fetching", `${host}/api/v1${path}`, options)
         const response = await fetch(`${host}/api/v1${path}`, options)
 
-        settings.logger.debug("response", response)
-
         if (!response.ok) {
             throw new Error(await response.text())
         }
