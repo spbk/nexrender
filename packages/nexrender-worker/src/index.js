@@ -180,10 +180,13 @@ const start = async (host, secret, settings, headers) => {
         settings.tolerateEmptyQueues = NEXRENDER_TOLERATE_EMPTY_QUEUES;
     }
 
+    settings.logger.log("Creating client with host:" + host)
     const client = createClient({ host, secret, headers });
+    settings.logger.log("Client created!")
 
     do {
         if(process.env.ENABLE_DATADOG_APM) {
+            settings.logger.log("ENABLE_DATADOG_APM is enabled attempting to trace")
             var result = await tracer.trace('job', async span => {
                 let job = await nextJobSetStarted(client, settings);
 
@@ -196,6 +199,7 @@ const start = async (host, secret, settings, headers) => {
             if (result === "break") break;
         }
         else {
+            settings.logger.log("ENABLE_DATADOG_APM is not enabled")
             let job = await nextJobSetStarted(client, settings);
             if (job === "break") break;
 
