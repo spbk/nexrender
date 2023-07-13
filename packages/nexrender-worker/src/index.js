@@ -1,5 +1,5 @@
+const { initTracer, init, render } = require('@nexrender/core')
 const { createClient } = require('@nexrender/api')
-const { init, render, initTracer } = require('@nexrender/core')
 const { getRenderingStatus } = require('@nexrender/types/job')
 
 var rollbar = null;
@@ -177,9 +177,7 @@ const start = async (host, secret, settings, headers) => {
         settings.tolerateEmptyQueues = NEXRENDER_TOLERATE_EMPTY_QUEUES;
     }
 
-    settings.logger.log("Creating client with host:" + host)
     const client = createClient({ host, secret, headers, settings });
-    settings.logger.log("Client created!", JSON.stringify(client))
 
     do {
         if(process.env.ENABLE_DATADOG_APM) {
@@ -190,8 +188,8 @@ const start = async (host, secret, settings, headers) => {
                 if (job === "break") return "break";//
 
                 span.setTag('uid', job.uid);
-                await processJob(client, settings, job)
-            })//
+                return await processJob(client, settings, job)
+            })
 
             if (result === "break") break;
         } else {

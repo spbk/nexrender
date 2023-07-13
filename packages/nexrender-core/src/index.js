@@ -1,5 +1,10 @@
 'use strict';
 
+var preInitTracer
+if (process.env.ENABLE_DATADOG_APM) {
+    preInitTracer = require('dd-trace').init();
+}
+
 const fs           = require('fs')
 const os           = require('os')
 const path         = require('path')
@@ -155,7 +160,7 @@ const initTracer = (settings) => {
 
     if(process.env.ENABLE_DATADOG_APM) {
         settings.logger.log("Datadog APM enabling...");
-        localTracer = require('dd-trace').init();
+        localTracer = preInitTracer;
         settings.logger.log(JSON.stringify(localTracer._tracer._url))
     } else {
         // define noop tracer if datadog is not enabled
