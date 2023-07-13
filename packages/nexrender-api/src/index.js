@@ -1,6 +1,9 @@
 const fetch = require('isomorphic-unfetch')
 
 const createClient = ({ host, secret, polling, headers, settings }) => {
+    console.log("creating client")
+    settings.logger.log("testing in create client")
+
     settings.logger.debug("defining wrapped fetch")
     const wrappedFetch = async (path, options) => {
         settings.logger.debug("wrapped fetch", path, options)
