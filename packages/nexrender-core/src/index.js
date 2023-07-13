@@ -156,7 +156,7 @@ const initTracer = (settings) => {
     if(process.env.ENABLE_DATADOG_APM) {
         settings.logger.log("Datadog APM enabling...");
         localTracer = require('dd-trace').init();
-        settings.logger.log(JSON.stringify(localTracer.options))
+        settings.logger.log(JSON.stringify(localTracer._tracer._url))
     } else {
         // define noop tracer if datadog is not enabled
         localTracer = new NoopTracer()
