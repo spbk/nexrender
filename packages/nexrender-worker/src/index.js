@@ -185,7 +185,7 @@ const start = async (host, secret, settings, headers) => {
             var result = await settings.tracer.trace('job', async span => {
                 let job = await nextJobSetStarted(client, settings);
 
-                if (job === "break") return "break";//
+                if (job === "break") return "break";
 
                 span.setTag('uid', job.uid);
                 return await processJob(client, settings, job)
