@@ -1,6 +1,6 @@
 const fetch = require('isomorphic-unfetch')
 
-const createClient = ({ host, secret, polling, headers, settings }) => {
+const createClient = ({ host, secret, polling, headers }) => {
     const wrappedFetch = async (path, options) => {
         options = options || {}
 

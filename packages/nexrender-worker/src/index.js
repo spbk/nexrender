@@ -177,7 +177,7 @@ const start = async (host, secret, settings, headers) => {
         settings.tolerateEmptyQueues = NEXRENDER_TOLERATE_EMPTY_QUEUES;
     }
 
-    const client = createClient({ host, secret, headers, settings });
+    const client = createClient({ host, secret, headers });
 
     do {
         if(process.env.ENABLE_DATADOG_APM) {
