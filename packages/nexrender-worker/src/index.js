@@ -183,7 +183,7 @@ const start = async (host, secret, settings, headers) => {
         if(process.env.ENABLE_DATADOG_APM) {
             settings.logger.log("ENABLE_DATADOG_APM is enabled")
             var result = await settings.tracer.trace('job', async span => {
-                let job = await nextJobSetStarted(client, settings);//
+                let job = await nextJobSetStarted(client, settings);
 
                 if (job === "break") return "break";//
 
