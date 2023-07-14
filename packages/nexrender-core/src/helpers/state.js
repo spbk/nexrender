@@ -14,11 +14,10 @@ module.exports = (job, settings, fn, fnName) => {
         })    
     } else {
         job.state = `render:${fnName}`;
-    
         if (job.onChange) {
             return job.onChange(job, job.state);
         }
-    
-        return fn(job, settings);    
+
+        return fn(job, settings);
     }
 }

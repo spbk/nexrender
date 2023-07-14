@@ -34,7 +34,7 @@ const nextJob = async (client, settings) => {
                 await client.pickupJob(settings.tagSelector) :
                 await client.pickupJob()
             );
-            
+
             if (job && job.uid) {
                 emptyReturns = 0;
                 return job
