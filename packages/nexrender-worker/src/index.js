@@ -1,5 +1,5 @@
+const { initTracer, init, render } = require('@nexrender/core')
 const { createClient } = require('@nexrender/api')
-const { init, render } = require('@nexrender/core')
 const { getRenderingStatus } = require('@nexrender/types/job')
 
 var rollbar = null;
@@ -15,17 +15,6 @@ if(process.env.ENABLE_ROLLBAR) {
       }
     });
 }
-
-
-
-var tracer = null;
-var renderWithTrace = null;
-
-if(process.env.ENABLE_DATADOG_APM) {
-    tracer = require('dd-trace').init();
-    renderWithTrace = tracer.wrap('render', render);
-}
-
 
 const NEXRENDER_API_POLLING = process.env.NEXRENDER_API_POLLING || 30 * 1000;
 const NEXRENDER_TOLERATE_EMPTY_QUEUES = process.env.NEXRENDER_TOLERATE_EMPTY_QUEUES;
@@ -99,7 +88,8 @@ const processJob = async (client, settings, job) => {
         }
 
         if (process.env.ENABLE_DATADOG_APM) {
-            job = await renderWithTrace(job, settings); {
+            let wrappedRender = settings.tracer.wrap('render', render)
+            job = await wrappedRender(job, settings); {
                 job.state = 'finished';
                 job.finishedAt = new Date()
             }
@@ -171,6 +161,7 @@ const start = async (host, secret, settings, headers) => {
     settings = init(Object.assign({}, settings, {
         logger: console,
     }))
+    settings.tracer = initTracer(settings)
 
     settings.logger.log('starting nexrender-worker with following settings:')
     Object.keys(settings).forEach(key => {
@@ -190,18 +181,19 @@ const start = async (host, secret, settings, headers) => {
 
     do {
         if(process.env.ENABLE_DATADOG_APM) {
-            var result = await tracer.trace('job', async span => {
+            settings.logger.log("ENABLE_DATADOG_APM is enabled")
+            var result = await settings.tracer.trace('job', async span => {
                 let job = await nextJobSetStarted(client, settings);
 
                 if (job === "break") return "break";
 
                 span.setTag('uid', job.uid);
-                await processJob(client, settings, job)
+                return await processJob(client, settings, job)
             })
 
             if (result === "break") break;
-        }
-        else {
+        } else {
+            settings.logger.log("ENABLE_DATADOG_APM is not enabled")
             let job = await nextJobSetStarted(client, settings);
             if (job === "break") break;
 
