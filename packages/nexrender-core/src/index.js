@@ -152,7 +152,7 @@ class NoopScope {
 }
 class NoopTracer {
     wrap(_name, cb) { return cb() }
-    
+
     trace(_name, cb) { return cb(new NoopSpan()) }
 
     scope() { return new NoopScope() }
