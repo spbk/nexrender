@@ -168,7 +168,7 @@ Estimated date of change to the new behavior: 2023-06-01.\n`);
     
     // wrap render process so we can track it
     // this should work because if the CB passed to trace() returns a promise, the span should finish when the promise is resolved or rejected https://datadoghq.dev/dd-trace-js/interfaces/tracer.html#trace
-    settings.tracer.trace('dorender.aerender', _span => {
+    settings.tracer.trace('aerender', _span => {
         // spawn process and begin rendering
         return new Promise((resolve, reject) => {
             renderStopwatch = Date.now();
