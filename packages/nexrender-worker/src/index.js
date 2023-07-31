@@ -192,7 +192,7 @@ const start = async (host, secret, settings, headers) => {
 
                 span.setTag('uid', job.uid);
 
-                if (job.tags) span.setTag('tags', job.tags.join(","))
+                if (job.tags) span.setTag('tags', job.tags)
 
                 return await processJob(client, settings, job)
             })
