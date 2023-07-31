@@ -147,10 +147,15 @@ class NoopSpan {
     setTag(_key, _value) { return this }
 }
 
+class NoopScope {
+    active() { return new NoopSpan() }
+}
 class NoopTracer {
     wrap(_name, cb) { return cb() }
 
     trace(_name, cb) { return cb(new NoopSpan()) }
+
+    scope() { return new NoopScope() }
 }
 
 const initTracer = (settings) => {
