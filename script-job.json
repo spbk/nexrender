@@ -1,0 +1,12 @@
+{
+    "template": {
+        "src": "file:///Users/ec2-user/nexrender/template.aep",
+        "composition": "Shared Comp"
+    },
+    "assets": [
+        {
+            "src": "file:///Users/ec2-user/nexrender/output-settings.jsx",
+            "type": "script"
+        }
+    ]
+}
