@@ -41,7 +41,12 @@ const insert = async entry => {
     entry.updatedAt = now;
     entry.createdAt = now;
     
-    await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry));
+    if (process.env.REDIS_TTL) {
+        // the EX below configures the expiration TTL (Time to live) in Redis.
+        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry), 'EX', process.env.NEXRENDER_REDIS_TTL);
+    } else {
+        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry));
+    }
 };
 
 const fetch = async uid => {
