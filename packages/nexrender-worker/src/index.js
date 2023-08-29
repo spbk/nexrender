@@ -64,6 +64,7 @@ const processJob = async (client, settings, job) => {
     } catch(err) {
         settings.logger.log(`[${job.uid}] error while updating job state to ${job.state}. Job abandoned.`)
         settings.logger.log(`[${job.uid}] error stack: ${err.stack}`)
+        settings.tracer?.scope()?.active()?.setTag('status', "error")
         return  "continue";
     }
 
@@ -79,11 +80,13 @@ const processJob = async (client, settings, job) => {
                     settings.logger.log(`[${job.uid}] error occurred: ${err.stack}`)
                     settings.logger.log(`[${job.uid}] render proccess stopped with error...`)
                     settings.logger.log(`[${job.uid}] continue listening next job...`)
+                    settings.tracer?.scope()?.active()?.setTag('status', "error")
                 }
             }
         }
 
         job.onRenderError = (job, err /* on render error */) => {
+            settings.tracer?.scope()?.active()?.setTag('status', "error")
             job.error = [].concat(job.error || [], [err.toString()]);
         }
 
@@ -188,6 +191,9 @@ const start = async (host, secret, settings, headers) => {
                 if (job === "break") return "break";
 
                 span.setTag('uid', job.uid);
+
+                if (job.tags) span.setTag('tags', job.tags)
+
                 return await processJob(client, settings, job)
             })
 
