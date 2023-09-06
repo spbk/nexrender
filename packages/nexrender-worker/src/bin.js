@@ -37,6 +37,7 @@ const args = arg({
     '--reuse':                  Boolean,
 
     '--max-memory-percent':     Number,
+    '--max-render-timeout': Number,
     '--image-cache-percent':    Number,
     '--polling':                Number,
     '--header':                 [String],
@@ -144,6 +145,8 @@ if (args['--help']) {
                                             the value is a percentage of the installed RAM, and is otherwise a percentage of n.
                                             The value of n is 2 GB for 32-bit Windows, 4 GB for 64-bit Windows, and 3.5 GB for Mac OS.
 
+    --max-render-timeout                    Number, set max render timeout in seconds, will abort rendering if it takes longer than this value (default: 0 - disabled)
+
     --image-cache-percent                   (from Adobe site): specifies the maximum percentage of memory used
                                             to cache already rendered images and footage.
 
@@ -208,6 +211,7 @@ opt('stopOnError',          '--stop-on-error');
 opt('tolerateEmptyQueues',  '--tolerate-empty-queues');
 opt('exitOnEmptyQueue',     '--exit-on-empty-queue');
 opt('maxMemoryPercent',     '--max-memory-percent');
+opt('maxRenderTimeout',     '--max-render-timeout');
 opt('imageCachePercent',    '--image-cache-percent');
 opt('polling',              '--polling');
 opt('wslMap',               '--wsl-map');
