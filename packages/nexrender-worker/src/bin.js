@@ -37,7 +37,7 @@ const args = arg({
     '--reuse':                  Boolean,
 
     '--max-memory-percent':     Number,
-    '--max-render-timeout': Number,
+    '--max-render-timeout':     Number,
     '--image-cache-percent':    Number,
     '--polling':                Number,
     '--header':                 [String],
