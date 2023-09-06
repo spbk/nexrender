@@ -173,6 +173,7 @@ opt('multiFramesCPU',       '--multi-frames-cpu');
 opt('reuse',                '--reuse');
 opt('stopOnError',          '--stop-on-error');
 opt('maxMemoryPercent',     '--max-memory-percent');
+opt('maxRenderTimeout',     '--max-render-timeout');
 opt('imageCachePercent',    '--image-cache-percent');
 opt('wslMap',               '--wsl-map');
 opt('aeParams',             '--aerender-parameter');
