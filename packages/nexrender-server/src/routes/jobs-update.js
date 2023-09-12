@@ -7,8 +7,6 @@ module.exports = async (req, res) => {
     const data = await json(req, {limit: "100mb"})
     const job  = Object.assign({}, await fetch(req.params.uid) || {}, data);
 
-    console.log(`updating job ${job.uid}`)
-
     try {
         assert(validate(job) == true);
         send(res, 200, await update(req.params.uid, job));

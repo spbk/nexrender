@@ -10,8 +10,6 @@ module.exports = async (req, res) => {
     const release = await mutex.acquire();
 
     try{
-        console.log(`fetching a pickup job for a worker`)
-
         const listing = await fetch()
         let queued = []
 
