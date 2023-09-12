@@ -15,8 +15,6 @@ module.exports = async (req, res) => {
         job.creator = req.headers["x-forwarded-for"] || req.socket.remoteAddress
     }
 
-    console.log(`creating new job ${job.uid}`)
-
     try {
         assert(validate(job) == true);
         await insert(job);
