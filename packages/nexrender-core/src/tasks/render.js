@@ -203,7 +203,7 @@ Estimated date of change to the new behavior: 2023-06-01.\n`);
             timeoutID = setTimeout(
                 () => {
                     reject(new Error(`Maximum rendering time exceeded`));
-                    instance.kill('SIGKILL'); // If the applciation isn't responding, kill it with fire
+                    instance.kill('SIGKILL'); // If the application isn't responding, kill it with fire
                 },
                 timeout
             );
