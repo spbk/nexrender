@@ -206,6 +206,7 @@ opt('skipRender',           '--skip-render');
 opt('forceCommandLinePatch','--force-patch');
 opt('debug',                '--debug');
 opt('multiFrames',          '--multi-frames');
+opt('multiFramesCPU',       '--multi-frames-cpu');
 opt('reuse',                '--reuse');
 opt('stopOnError',          '--stop-on-error');
 opt('tolerateEmptyQueues',  '--tolerate-empty-queues');
