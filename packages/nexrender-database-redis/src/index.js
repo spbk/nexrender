@@ -40,13 +40,9 @@ const insert = async entry => {
 
     entry.updatedAt = now;
     entry.createdAt = now;
-    
-    if (process.env.NEXRENDER_REDIS_TTL) {
-        // the EX below configures the expiration TTL (Time to live) in Redis.
-        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry), 'EX', process.env.NEXRENDER_REDIS_TTL);
-    } else {
-        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry));
-    }
+
+    // use await setNextJob(entry); to set TTL
+    await setNextJob(entry);
 };
 
 const fetch = async uid => {
@@ -70,7 +66,8 @@ const update = async (uid, object) => {
         { updatedAt: now }
     );
 
-    await client.setAsync(`nexjob:${uid}`, JSON.stringify(entry));
+    // use await setNextJob(entry); to set TTL
+    await setNextJob(entry);
     return entry;
 };
 
@@ -84,6 +81,16 @@ const cleanup = () => {
         return await client.del(result);
     });
 };
+
+// use this method to set TTL rather than client.setAsync
+const setNextJob = async (entry) => {
+    if (process.env.NEXRENDER_REDIS_TTL) {
+        // the EX below configures the expiration TTL (Time to live) in Redis.
+        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry), 'EX', process.env.NEXRENDER_REDIS_TTL);
+    } else {
+        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry));
+    }
+}
 
 module.exports = {
     insert,
