@@ -84,9 +84,19 @@ const cleanup = () => {
 
 // use this method to set TTL rather than client.setAsync
 const setNextJob = async (entry) => {
+    client.log(`nexrender-database-redis: setting TTL for ${entry.uid} to ${process.env.NEXRENDER_REDIS_TTL} seconds`);
     if (process.env.NEXRENDER_REDIS_TTL) {
-        // the EX below configures the expiration TTL (Time to live) in Redis.
-        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry), 'EX', process.env.NEXRENDER_REDIS_TTL);
+        // the ex below configures the expiration TTL (Time to live) in Redis.
+        // https://redis.io/commands/set
+        // for our version of redis, it seems like we need to use the key 'ex' instead of 'EX'
+        // and that the value should be an integer. The API for the old version isn't very clear.
+        // https://github.com/redis/node-redis/blob/v3.1.2/test/commands/set.spec.js#L67
+        // 60 * 60 * 24 = 1 day hardcoding for now to ensure that it works.
+        let ttl = parseInt(process.env.NEXRENDER_REDIS_TTL);
+        if (parseInt(ttl) > 0) {
+            ttl = 60 * 60 * 24
+        }
+        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry), 'ex', ttl);
     } else {
         await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry));
     }
