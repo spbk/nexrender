@@ -82,11 +82,10 @@ const cleanup = () => {
     });
 };
 
-// use this method to set TTL rather than client.setAsync
+// set TTL based on env variable and pass to client.setAsync
 const setNextJob = async (entry) => {
     if (process.env.NEXRENDER_REDIS_TTL) {
-        // the EX below configures the expiration TTL (Time to live) in Redis.
-        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry), 'EX', process.env.NEXRENDER_REDIS_TTL);
+        await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry), 'ex', process.env.NEXRENDER_REDIS_TTL);
     } else {
         await client.setAsync(`nexjob:${entry.uid}`, JSON.stringify(entry));
     }
